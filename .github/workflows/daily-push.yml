@@ -37,4 +37,4 @@ jobs:
           TINGTING_LUNAR_BIRTHDAY: ${{ secrets.TINGTING_LUNAR_BIRTHDAY }}
           LOVE_START_DATE: ${{ secrets.LOVE_START_DATE }}
           MEET_START_DATE: ${{ secrets.MEET_START_DATE }}
-        run: python main.py
+        run: python wechat_daily_push.py
