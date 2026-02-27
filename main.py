@@ -2,10 +2,14 @@ import requests
 import datetime
 import json
 import os
-from dotenv import load_dotenv  # 新增：加载环境变量
+from dotenv import load_dotenv  # 加载环境变量
 import lunardate  # 导入农历处理库
+import pytz
 
-# 加载环境变量
+# ====== 核心修改：全局使用北京时间 ======
+# 设置北京时间时区
+beijing_tz = pytz.timezone('Asia/Shanghai')
+# 加载环境变量（只需要执行一次）
 load_dotenv()
 
 # ====== 从环境变量获取配置 ======
@@ -61,8 +65,9 @@ def get_weather():
         raise Exception(f"获取天气失败: {str(e)}")
 
 def calculate_special_days():
-    """计算农历生日、恋爱天数、认识天数"""
-    today = datetime.datetime.now().date()
+    """计算农历生日、恋爱天数、认识天数（基于北京时间）"""
+    # 核心修改：使用北京时间的今日日期
+    today = datetime.datetime.now(beijing_tz).date()
 
     # 1. 计算距离婷婷农历生日的天数
     lunar_birth = datetime.datetime.strptime(TINGTING_LUNAR_BIRTHDAY, "%Y-%m-%d")
@@ -103,13 +108,16 @@ def calculate_special_days():
     }
 
 def get_daily_message():
-    """生成每日推送内容（新增认识天数）"""
-    today = datetime.datetime.now().strftime("%Y年%m月%d日")
+    """生成每日推送内容（新增认识天数，基于北京时间）"""
+    # 核心修改：使用北京时间生成日期字符串和小时判断
+    now = datetime.datetime.now(beijing_tz)
+    today = now.strftime("%Y年%m月%d日")  # 北京时间的今日日期
+    hour = now.hour  # 北京时间的当前小时（用于早安/晚安判断）
+    
     weather = get_weather()
     special_days = calculate_special_days()
 
-    # 早安/晚安切换逻辑
-    hour = datetime.datetime.now().hour
+    # 早安/晚安切换逻辑（基于北京时间）
     if 6 <= hour < 12:
         greeting = "早安呀宝贝 💖"
         extra_msg = f"今天{weather['weather']}，温度{weather['temp_min']}°C-{weather['temp_max']}°C，{weather['wind']}{weather['wind_scale']}级，记得好好吃早餐～"
@@ -190,5 +198,8 @@ if __name__ == "__main__":
     except ImportError as e:
         print(f"导入错误：{e} → 请执行 pip install -r requirements.txt 安装依赖")
     except Exception as e:
+        # 新增：打印详细的错误堆栈，方便排查
+        import traceback
+        traceback.print_exc()
         print(f"程序执行失败: {str(e)}")
         exit(1)
