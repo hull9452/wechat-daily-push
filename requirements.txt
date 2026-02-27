@@ -1,3 +1,4 @@
-requests>=2.31.0
-lunardate>=0.2.0
-python-dotenv>=1.0.0
+requests
+python-dotenv
+lunardate
+pytz
