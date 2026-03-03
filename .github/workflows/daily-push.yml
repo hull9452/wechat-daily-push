@@ -5,8 +5,11 @@ name: Daily WeChat Push
 # 每天晚上21点推送 → UTC时间13点 → cron: 0 13 * * *
 on:
   schedule:
-    - cron: '0 20 * * *'  
-  workflow_dispatch:  # 手动触发开关
+    # 每天早上 7:30 (UTC 23:30)
+    - cron: '30 23 * * *'
+    # 每天晚上 8:30 (UTC 12:30)
+    - cron: '30 12 * * *'
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   send-message:
